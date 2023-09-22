@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  </head>
+  <body>
+    
+    <script>
+        AFRAME.registerComponent('darker-over-time', {
+          init: function () {
+            const el = this.el;
+            let intensity = 1; // Initial intensity (1 is normal, 0 is completely dark)
+            const intervalMs = 1000; // Change color every 3 seconds
+            const totalTimeMs = 10000; 
+  
+            // Function to darken the material color
+            function darkenMaterial() {
+              intensity -= 0.1; // Decrease intensity (you can adjust the rate)
+              if (intensity < 0) {
+                intensity = 0; // Ensure the intensity doesn't go below 0
+              }
+  
+              // Set the new color with adjusted intensity
+              const color = `rgb(${Math.round(46 * intensity)}, ${Math.round(204 * intensity)}, ${Math.round(113 * intensity)})`;
+              el.setAttribute('material', 'color', color);
+            }
+            function lightenMaterial() {
+                intensity += 0.1; // Decrease intensity (you can adjust the rate)
+                if (intensity > 1) {
+                    intensity = 1; // Ensure the intensity doesn't go below 0
+                }
+
+                // Set the new color with adjusted intensity
+                const color = `rgb(${Math.round(46 * intensity)}, ${Math.round(204 * intensity)}, ${Math.round(113 * intensity)})`;
+                el.setAttribute('material', 'color', color);
+            }
+            
+            const darkeningInterval = setInterval(darkenMaterial, intervalMs);
+
+            setTimeout(() => {
+            clearInterval(darkeningInterval);
+
+            // Start the lighter-over-time script
+            const lighterInterval = setInterval(lightenMaterial, intervalMs);
+
+            // Stop the lightening transition after totalTimeMs
+            setTimeout(() => {
+              clearInterval(lighterInterval);
+            }, totalTimeMs);
+          }, totalTimeMs);
+        },
+        });
+      </script>
+
+    <a-scene>
+      <!-- Camera inside the room -->
+      <a-camera position="0 2 -3.5"></a-camera>
+      <!-- Room components -->
+      <a-box position="0 0 -5" width="12" height="2" depth="11" color="#afb2b3" darker-over-time></a-box> <!-- Floor -->
+      <a-box position="0 3.5 -5" width="11" height="1" depth="11" color="#ecf0f1" darker-over-time></a-box> <!-- Ceiling -->
+      <a-box position="0 2.5 -8" width="10" height="2.5" depth="1" color="#e74c3c" darker-over-time></a-box> <!-- Front Wall -->
+      <a-box position="0 2.5 1" width="10" height="2.5" depth="1" color="#e74c3c" darker-over-time></a-box> <!-- Back Wall -->
+      <a-box position="-4.5 2.5 -4" width="1" height="2.5" depth="9" color="#2ecc71" darker-over-time></a-box> <!-- Left Wall -->
+      <a-box position="5 2.5 -3" width="1" height="2.5" depth="9" color="#f1c40f" darker-over-time></a-box> <!-- Right Wall -->
+    </a-scene>
+
+  </body>
+</html>
