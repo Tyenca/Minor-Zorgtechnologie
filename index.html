@@ -3,6 +3,8 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
   </head>
   <body>
     
@@ -67,17 +69,54 @@
         });
       </script>
 
-        <a-scene>
-        <!-- Camera inside the room -->
-        <a-camera position="0 2 -1.5" rotation="45 0 0"></a-camera>
-        
-        <!-- Room components -->
-        <a-box position="0 0 -3.7" width="15" height="2.1" depth="15" color="#afb2b3" darker-over-time="boxColor: #afb2b3;"></a-box> <!-- Floor -->
-        <a-box position="0.25 4.2 -3.5" width="10.5" height="1" depth="10" color="#ecf0f1" darker-over-time="boxColor: #ecf0f1;"></a-box> <!-- Ceiling -->
-        <a-box position="0.3 2.5 -8" width="10.4" height="2.5" depth="1" color="#e74c3c" darker-over-time="boxColor: #e74c3c;"></a-box> <!-- Front Wall -->
-        <a-box position="0 2.5 1" width="10" height="2.5" depth="1" color="#e74c3c" darker-over-time="boxColor: #e74c3c;"></a-box> <!-- Back Wall -->
-        <a-box position="-4.5 2.5 -4" width="1" height="2.5" depth="9" color="#f1c40f" darker-over-time="boxColor: #f1c40f;"></a-box> <!-- Left Wall -->
-        <a-box position="5 2.5 -3" width="1" height="2.5" depth="9" color="#2ecc71" darker-over-time="boxColor: #2ecc71;"></a-box> <!-- Right Wall -->
+      <script>
+        AFRAME.registerComponent('limit-my-distance', {
+    
+          init: function() {
+            this.zero = new THREE.Vector3(0, 0, 0);
+          },
+          tick: function() {
+            const camera = document.querySelector('#camera');
+            // const currentPosition = camera.getAttribute('position');
+            // console.log(currentPosition);
+            let currentPosition = camera.getAttribute('position');
+
+            // In case of collision with right wall
+            if (currentPosition.x >= 4.5) {
+              currentPosition = camera.getAttribute('position');
+              this.el.object3D.position.set((currentPosition.x - 0.5), currentPosition.y, (currentPosition.z));
+            }
+            // In case of collision with left wall
+            if (currentPosition.x <= -4) {
+              currentPosition = camera.getAttribute('position');
+              this.el.object3D.position.set((currentPosition.x + 0.5), currentPosition.y, (currentPosition.z));
+            }
+            // In case of collision with front wall
+            if (currentPosition.z <= -6.5) {
+              currentPosition = camera.getAttribute('position');
+              this.el.object3D.position.set(currentPosition.x, currentPosition.y, (currentPosition.z + 0.5));
+            }
+            // In case of collision with back wall
+            if (currentPosition.z >= 0) {
+              currentPosition = camera.getAttribute('position');
+              this.el.object3D.position.set(currentPosition.x, currentPosition.y, (currentPosition.z - 0.5));
+            }
+          }
+        });
+      </script>
+    
+    <a-scene>
+      <!-- Camera inside the room -->
+      <!-- <a-camera id="camera" position="0 2 -1.5" look-controls kinematic-body></a-camera> -->
+      <a-camera id="camera" position="0 2 -1.5" limit-my-distance></a-camera>
+    
+      <!-- Room components -->
+        <a-box class="wall" position="0 0 -3.7" width="15" height="2.1" depth="15" color="#afb2b3" darker-over-time="boxColor: #afb2b3;" static-body></a-box> <!-- Floor -->
+        <a-box class="wall" position="0.25 4.2 -3.5" width="10.5" height="1" depth="10" color="#ecf0f1" darker-over-time="boxColor: #ecf0f1;" static-body></a-box> <!-- Ceiling -->
+        <a-box class="wall" position="0.3 2.5 -8" width="10.4" height="2.5" depth="1" color="#e74c3c" darker-over-time="boxColor: #e74c3c;" static-body ></a-box> <!-- Front Wall -->
+        <a-box class="wall" position="0 2.5 1" width="10" height="2.5" depth="1" color="#e74c3c" darker-over-time="boxColor: #e74c3c;" static-body></a-box> <!-- Back Wall -->
+        <a-box class="wall" position="-4.5 2.5 -4" width="1" height="2.5" depth="9" color="#f1c40f" darker-over-time="boxColor: #f1c40f;" static-body></a-box> <!-- Left Wall -->
+        <a-box class="wall" position="5 2.5 -3" width="1" height="2.5" depth="9" color="#2ecc71" darker-over-time="boxColor: #2ecc71;" static-body></a-box> <!-- Right Wall -->
         
         <!-- Furniture -->
 
@@ -110,8 +149,6 @@
         
         <!-- <a-light type="directional" position="-3 5 0" intensity="0.5" target="#bed"></a-light> -->
     </a-scene>
-
-    
 
   </body>
 </html>
